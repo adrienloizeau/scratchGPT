@@ -94,6 +94,21 @@ class MultiHeadAttention(nn.Module):
         out = torch.cat([h(x) for h in self.heads], dim=-1)
         out = self.dropout(out)
         return out
+    
+
+class FeedForward(nn.Module):
+    def __init__(self, n_embd):
+        super(FeedForward, self).__init__()
+        self.net = nn.Sequential(
+            nn.Linear(n_embd, 4*n_embd),
+            nn.ReLU(),
+            nn.Linear(4*n_embd, n_embd),
+            nn.Dropout(0.1)
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
 
 class Model(nn.Module):
     def __init__(self, vocab_size, block_size= 8, n_emb=32):
@@ -102,6 +117,7 @@ class Model(nn.Module):
         self.token_embedding_table = nn.Embedding(vocab_size,n_emb)         
         self.positionnal_embedding_table = nn.Embedding(block_size, n_emb)
         self.sa_heads = MultiHeadAttention(4, n_emb//4)
+        self.feed_forward = FeedForward(n_emb)
         self.lm_head = nn.Linear(n_emb, vocab_size)
         # self.embedding_out = nn.Embedding(n_emb, block_size)
      
@@ -117,6 +133,7 @@ class Model(nn.Module):
         pos_embedding = self.positionnal_embedding_table(torch.arange(T, device = device)) # (T, C)
         x = token_embedding + pos_embedding # (B, T, C)
         x = self.sa_heads(x) # (B, T, C)
+        x = self.feed_forward(x) # (B, T, C)
         logits = self.lm_head(x) # (B, T, vocab_size)
         
         if target is not None: 
