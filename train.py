@@ -17,7 +17,10 @@ eval_interval = 300
 device = "cuda" if torch.cuda.is_available() else "cpu"
 eval_iters = 200
 n_embd = 32
+nb_heads = 4
+nb_layers = 4
 
+# Set the random seed for reproducibility
 torch.manual_seed(123)
 
 
@@ -63,7 +66,7 @@ class Head(nn.Module):
         self.query = nn.Linear(n_embd, head_size, bias=False) # keeps information about the position
         self.value = nn.Linear(n_embd, head_size, bias=False) # keeps information about the value of each token to the position
         self.register_buffer("tril", torch.tril(torch.ones(block_size, block_size)))
-        self.dropout = nn.Dropout(0.1)
+        self.dropout = nn.Dropout(0.2)
         self.head_size = head_size
         self.scale = head_size ** -0.5
 
@@ -88,7 +91,7 @@ class MultiHeadAttention(nn.Module):
     def __init__(self, head_size, num_heads):
         super(MultiHeadAttention, self).__init__()
         self.heads = nn.ModuleList([Head(head_size) for _ in range(num_heads)])
-        self.dropout = nn.Dropout(0.1)
+        self.dropout = nn.Dropout(0.2)
         self.proj = nn.Linear(n_embd, n_embd)
     def forward(self, x):
         out = torch.cat([h(x) for h in self.heads], dim=-1)
@@ -104,7 +107,7 @@ class FeedForward(nn.Module):
             nn.Linear(n_embd, 4*n_embd),
             nn.ReLU(),
             nn.Linear(4*n_embd, n_embd),
-            nn.Dropout(0.1)
+            nn.Dropout(0.2)
         )
 
     def forward(self, x):
@@ -117,25 +120,24 @@ class Block(nn.Module):
         head_size = n_embd // n_heads
         self.sa = MultiHeadAttention(head_size, n_heads)
         self.ffwd = FeedForward(n_embd)
+        self.ln1 = nn.LayerNorm(n_embd)
+        self.ln2 = nn.LayerNorm(n_embd)
 
     def forward(self, x):
-        x = self.sa(x) + x
-        x = self.ffwd(x) + x
+        x = x + self.sa(self.ln1(x)) 
+        x = x + self.ffwd(self.ln2(x))
         return x
     
 class Model(nn.Module):
-    def __init__(self, vocab_size, block_size= 8, n_emb=32):
+    def __init__(self, vocab_size, block_size= 8, n_embd=32, nb_heads=4, nb_layers=4):
         super(Model,self).__init__()
         # table of vocab_size x vocab_size to predict the next token only based on the current token
-        self.token_embedding_table = nn.Embedding(vocab_size,n_emb)         
-        self.positionnal_embedding_table = nn.Embedding(block_size, n_emb)
-        self.sa_blocks = nn.Sequential(
-                Block(n_emb, 4),
-                Block(n_emb, 4),
-                Block(n_emb, 4),
-        )
-        self.feed_forward = FeedForward(n_emb)
-        self.lm_head = nn.Linear(n_emb, vocab_size)
+        self.token_embedding_table = nn.Embedding(vocab_size,n_embd)         
+        self.positionnal_embedding_table = nn.Embedding(block_size, n_embd)
+        self.sa_blocks = nn.Sequential(*[Block(n_embd, nb_heads) for _ in range(nb_layers)]) # 4 blocks of self attention
+        self.ln = nn.LayerNorm(n_embd)
+        self.feed_forward = FeedForward(n_embd)
+        self.lm_head = nn.Linear(n_embd, vocab_size)
         # self.embedding_out = nn.Embedding(n_emb, block_size)
      
     def forward(self, idx, target = None):
@@ -149,7 +151,8 @@ class Model(nn.Module):
         token_embedding = self.token_embedding_table(idx) # (B, T, C)
         pos_embedding = self.positionnal_embedding_table(torch.arange(T, device = device)) # (T, C)
         x = token_embedding + pos_embedding # (B, T, C)
-        x = self.sa_blocks(x) # (B, T, C)
+        x=  self.sa_blocks(x)
+        x = self.ln(x) # (B, T, C)
         x = self.feed_forward(x) # (B, T, C)
         logits = self.lm_head(x) # (B, T, vocab_size)
         
@@ -177,9 +180,9 @@ class Model(nn.Module):
             idx_next = torch.multinomial(probs, num_samples=1) # (B, 1)
             # append sampled index to the running sequence
             idx = torch.cat((idx, idx_next), dim=1) # (B, T+1)
-        
         return idx
     
+
 @torch.no_grad()
 def estimate_loss(split):
     out = {}
@@ -220,7 +223,7 @@ train_data = torch.tensor(train_data, dtype=torch.long)
 val_data = torch.tensor(val_data, dtype=torch.long)
 
 # initialize the model and optimizer
-m = Model(tokenizer.vocab_size, block_size=block_size)
+m = Model(tokenizer.vocab_size, block_size=block_size, n_embd=n_embd, nb_heads=nb_heads, nb_layers=nb_layers)
 m = m.to(device)
 optimizer = torch.optim.AdamW(m.parameters(), lr=1e-3)
 for iter in tqdm(range(max_iters)):
@@ -240,6 +243,6 @@ print("Loss: ", loss.item())
 
 print("Training finished, generating text...")
 context = torch.zeros((1,1), dtype = torch.long).to(device)
-print(tokenizer.decode(m.generate(context, max_new_tokens = 100)[0]))
+print(tokenizer.decode(m.generate(context, max_new_tokens = 500)[0]))
 
 # print("x shape: ", x.shape)
