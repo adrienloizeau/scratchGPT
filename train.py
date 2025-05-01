@@ -84,13 +84,24 @@ class Head(nn.Module):
         return out
     
 
+class MultiHeadAttention(nn.Module):
+    def __init__(self, head_size, num_heads):
+        super(MultiHeadAttention, self).__init__()
+        self.heads = nn.ModuleList([Head(head_size) for _ in range(num_heads)])
+        self.dropout = nn.Dropout(0.1)
+
+    def forward(self, x):
+        out = torch.cat([h(x) for h in self.heads], dim=-1)
+        out = self.dropout(out)
+        return out
+
 class Model(nn.Module):
     def __init__(self, vocab_size, block_size= 8, n_emb=32):
         super(Model,self).__init__()
         # table of vocab_size x vocab_size to predict the next token only based on the current token
         self.token_embedding_table = nn.Embedding(vocab_size,n_emb)         
         self.positionnal_embedding_table = nn.Embedding(block_size, n_emb)
-        self.sa = Head(n_emb)
+        self.sa_heads = MultiHeadAttention(4, n_emb//4)
         self.lm_head = nn.Linear(n_emb, vocab_size)
         # self.embedding_out = nn.Embedding(n_emb, block_size)
      
@@ -105,7 +116,7 @@ class Model(nn.Module):
         token_embedding = self.token_embedding_table(idx) # (B, T, C)
         pos_embedding = self.positionnal_embedding_table(torch.arange(T, device = device)) # (T, C)
         x = token_embedding + pos_embedding # (B, T, C)
-        x = self.sa(x) # (B, T, C)
+        x = self.sa_heads(x) # (B, T, C)
         logits = self.lm_head(x) # (B, T, vocab_size)
         
         if target is not None: 
