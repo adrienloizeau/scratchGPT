@@ -6,7 +6,20 @@ import numpy as np
 from datasets import load_dataset
 from tqdm import tqdm
 
+
+
+# Hyperparameters
+learning_rate = 1e-2
+block_size = 8 # Maximum context length
+batch_size = 16 # nb of indepedant blocks fead to the model in parallel
+max_iters = 10000
+eval_interval = 300
+device = "cuda" if torch.cuda.is_available() else "cpu"
+eval_iters = 200
+
 torch.manual_seed(123)
+
+
 
 class CharTokenizer(nn.Module):
     def __init__(self, dataset):
@@ -21,31 +34,6 @@ class CharTokenizer(nn.Module):
 
     def decode(self, indices):
         return ''.join([self.decode_dict[i.item()] for i in indices])
-
-
-class Dataloader(nn.Module):
-    def __init__(self, data, batch_size=4, block_size=8, tokenizer=CharTokenizer):
-        super(Dataloader, self).__init__()
-        self.data = data
-        self.tokenizer = tokenizer
-        self.data = self.tokenize(data)
-        self.batch_size = batch_size
-        self.block_size = block_size
-
-    def get_batch(self):
-        # Generate a random batch of data
-        idx = torch.randint(0, len(self.data) - self.block_size, (self.batch_size,))
-        x = torch.stack([self.data[i: i+ self.block_size] for i in idx])
-        y = torch.stack([self.data[i+1: i + self.block_size + 1] for i in idx])
-        return x, y
-
-    def tokenize(self, text):
-        # Encode the input data
-        return self.tokenizer.encode(text)
-        
-    def detokenize(self, indices):
-        # Decode the output data
-        return self.tokenizer.decode(indices)
 
 
 def merge_dataset(ds):
@@ -113,11 +101,29 @@ class Model(nn.Module):
             idx = torch.cat((idx, idx_next), dim=1) # (B, T+1)
         
         return idx
-        
-# Hyperparameters
-learning_rate = 1e-3
-block_size = 8
-batch_size = 16 
+    
+@torch.no_grad()
+def estimate_loss(split):
+    out = {}
+    m.eval()
+    for split in ['train', 'val']:
+        losses = torch.zeros(eval_iters)
+        for k in range(eval_iters):
+            X, Y = get_batch(split)
+            logits, loss = m(X, Y)
+            losses[k] = loss.item()
+        out[split] = losses.mean()
+    m.train()
+    return out
+
+def get_batch(split):
+    # generate a small batch of data of inputs x and targets y
+    data = train_data if split == 'train' else val_data
+    ix = torch.randint(len(data) - block_size, (batch_size,))
+    x = torch.stack([data[i:i+block_size] for i in ix])
+    y = torch.stack([data[i+1:i+block_size+1] for i in ix])
+    x, y = x.to(device), y.to(device)
+    return x, y
 
 # Load the dataset, clean and split it
 ds = load_dataset("jonathanli/law-stack-exchange")
@@ -129,20 +135,33 @@ val_data = ds[split_size:]
 
 # Initialize the Tokenizer and DataLoader
 tokenizer = CharTokenizer(ds)
-train_loader = Dataloader(train_data, batch_size=batch_size, block_size=block_size, tokenizer=tokenizer)
-val_loader = Dataloader(val_data, batch_size=batch_size, block_size=block_size, tokenizer=tokenizer)
-x, y = train_loader.get_batch()
+
+train_data = tokenizer.encode(train_data)
+val_data = tokenizer.encode(val_data)
+train_data = torch.tensor(train_data, dtype=torch.long)
+val_data = torch.tensor(val_data, dtype=torch.long)
 
 # initialize the model and optimizer
 m = Model(tokenizer.vocab_size, block_size=block_size)
+m = m.to(device)
 optimizer = torch.optim.AdamW(m.parameters(), lr=1e-3)
+for iter in tqdm(range(max_iters)):
+   # evaluate the loss on train/val sets and write checkpoints
+    if iter % eval_interval == 0 :
+        losses = estimate_loss("val")
+        print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
 
-for step in tqdm(range(10000)):
-    logits, loss = m(x, y)
+    # train_loader = Dataloader(train_data, batch_size=batch_size, block_size=block_size, tokenizer=tokenizer)
+    x, y = get_batch('train')
+    logits, loss = m(x,y)
     optimizer.zero_grad(set_to_none=True)
     loss.backward()
     optimizer.step()
-print(loss.item())
-idx = torch.zeros((1,1), dtype = torch.long)
-print(tokenizer.decode(m.generate(idx, max_new_tokens = 100)[0]))
+
+print("Loss: ", loss.item())
+
+print("Training finished, generating text...")
+context = torch.zeros((1,1), dtype = torch.long).to(device)
+print(tokenizer.decode(m.generate(context, max_new_tokens = 100)[0]))
+
 # print("x shape: ", x.shape)
