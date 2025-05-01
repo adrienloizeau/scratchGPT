@@ -16,6 +16,7 @@ max_iters = 10000
 eval_interval = 300
 device = "cuda" if torch.cuda.is_available() else "cpu"
 eval_iters = 200
+n_embd = 32
 
 torch.manual_seed(123)
 
@@ -55,28 +56,58 @@ def clean_dataset(ds):
         cleaned_dataset = cleaned_dataset.replace(u,"")
     return cleaned_dataset
 
+class Head(nn.Module):
+    def __init__(self, head_size):
+        super(Head, self).__init__()
+        self.key = nn.Linear(n_embd, head_size, bias=False) # keeps information about the token
+        self.query = nn.Linear(n_embd, head_size, bias=False) # keeps information about the position
+        self.value = nn.Linear(n_embd, head_size, bias=False) # keeps information about the value of each token to the position
+        self.register_buffer("tril", torch.tril(torch.ones(block_size, block_size)))
+        self.dropout = nn.Dropout(0.1)
+        self.head_size = head_size
+        self.scale = head_size ** -0.5
+
+    def forward(self, x):
+        B, T, C = x.shape
+        k = self.key(x) # (B, T, C)
+        q = self.query(x) # (B, T, C)
+        v = self.value(x) # (B, T, C)
+        # compute attention scores 
+        wei = (q @ k.transpose(-2, -1)) * self.scale # scale for numerical stability
+        # mask out the future positions
+        mask = self.tril[:T, :T].unsqueeze(0) # create a mask of shape (1, T, T)
+        wei = wei.masked_fill(mask == 0, float("-inf")) # masks the future positions
+        # apply softmax to get the attention weights
+        wei = F.softmax(wei, dim=-1)
+        wei = self.dropout(wei)
+        out = wei @ v
+        return out
+    
 
 class Model(nn.Module):
     def __init__(self, vocab_size, block_size= 8, n_emb=32):
         super(Model,self).__init__()
         # table of vocab_size x vocab_size to predict the next token only based on the current token
-        self.token_embedding_table = nn.Embedding(vocab_size,vocab_size)         
-        # self.positionnal_embedding_table = nn.Embedding(vocab_size,vocab_size)
+        self.token_embedding_table = nn.Embedding(vocab_size,n_emb)         
+        self.positionnal_embedding_table = nn.Embedding(block_size, n_emb)
+        self.sa = Head(n_emb)
+        self.lm_head = nn.Linear(n_emb, vocab_size)
         # self.embedding_out = nn.Embedding(n_emb, block_size)
-        # self.linear = nn.Linear(vocab_size, vocab_size)
      
     def forward(self, idx, target = None):
         # For each idx in the batch we get the corresponding token
         # and compare it to the target
         # We theregore have the idx information and the positionnal information
         # idx (B, T) 
-        # target (B, T) 
+        # target (B, T)
 
-        logits = self.token_embedding_table(idx) # =>(B, T, C)
-        # pos = self.positionnal_embedding_table(idx)
-        # logits = logits + pos
-        # logits = logits.view(-1, logits.shape[2])
-        # logits = self.linear(logits)
+        B, T = idx.shape
+        token_embedding = self.token_embedding_table(idx) # (B, T, C)
+        pos_embedding = self.positionnal_embedding_table(torch.arange(T, device = device)) # (T, C)
+        x = token_embedding + pos_embedding # (B, T, C)
+        x = self.sa(x) # (B, T, C)
+        logits = self.lm_head(x) # (B, T, vocab_size)
+        
         if target is not None: 
             B, T, C = logits.shape
             logits = logits.view(B * T, C) 
@@ -90,7 +121,9 @@ class Model(nn.Module):
     def generate(self, idx, max_new_tokens):
         # idx is (B, T) array of indices in the current context
         for _ in range(max_new_tokens):
-            logits, loss = self(idx)
+
+            idx_cond = idx[:, -block_size:] # (B, T) -> (B, block_size)
+            logits, loss = self(idx_cond)
             # Focus only on the last time step -> so has all the block_size
             logits = logits[:, -1, :] # becomes (B, C)
             # apply softmax to get probs
