@@ -19,6 +19,8 @@ eval_iters = 200
 n_embd = 32
 nb_heads = 4
 nb_layers = 4
+save_path = "model.pt"
+mode = "scratch"
 
 # Set the random seed for reproducibility
 torch.manual_seed(123)
@@ -223,21 +225,30 @@ train_data = torch.tensor(train_data, dtype=torch.long)
 val_data = torch.tensor(val_data, dtype=torch.long)
 
 # initialize the model and optimizer
-m = Model(tokenizer.vocab_size, block_size=block_size, n_embd=n_embd, nb_heads=nb_heads, nb_layers=nb_layers)
-m = m.to(device)
+if mode == "scratch":
+    m = Model(tokenizer.vocab_size, block_size=block_size, n_embd=n_embd, nb_heads=nb_heads, nb_layers=nb_layers)
+    m = m.to(device)
+elif mode == "pretrained":
+    m = Model(tokenizer.vocab_size, block_size=block_size, n_embd=n_embd, nb_heads=nb_heads, nb_layers=nb_layers)
+    m = torch.load(save_path, map_location=device)
+    
 optimizer = torch.optim.AdamW(m.parameters(), lr=1e-3)
+best_val = float('inf')
 for iter in tqdm(range(max_iters)):
    # evaluate the loss on train/val sets and write checkpoints
     if iter % eval_interval == 0 :
         losses = estimate_loss("val")
         print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
+        if losses['val'] < best_val:
+            best_val = losses['val']
+            torch.save(m, save_path)
 
     # train_loader = Dataloader(train_data, batch_size=batch_size, block_size=block_size, tokenizer=tokenizer)
     x, y = get_batch('train')
     logits, loss = m(x,y)
     optimizer.zero_grad(set_to_none=True)
     loss.backward()
-    optimizer.step()
+    optimizer.step()    
 
 print("Loss: ", loss.item())
 
