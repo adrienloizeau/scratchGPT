@@ -1,0 +1,134 @@
+{
+    "pipeline": [
+        [
+            {
+                "limit": -1,
+                "skip": 0,
+                "text_key": "text",
+                "id_key": "id",
+                "adapter": "<bound method BaseReader._default_adapter of \ud83d\udcd6 - READER: \ud83d\udc3f Jsonl>",
+                "_empty_warning": false,
+                "default_metadata": null,
+                "data_folder": "DataFolder(path='/Users/adrienloizeau/dev/scratchGPT/data', fs=<fsspec.implementations.local.LocalFileSystem object at 0x11a66dde0>)",
+                "paths_file": null,
+                "recursive": true,
+                "glob_pattern": null,
+                "shuffle_files": false,
+                "file_progress": false,
+                "doc_progress": false,
+                "compression": "infer"
+            },
+            {
+                "sample_size": 3
+            },
+            {
+                "output_folder": "DataFolder(path='/Users/adrienloizeau/dev/scratchGPT/data/signatures', fs=<fsspec.implementations.local.LocalFileSystem object at 0x11a66dde0>)",
+                "config": {
+                    "n_grams": 5,
+                    "num_buckets": 14,
+                    "hashes_per_bucket": 8,
+                    "seed": 1,
+                    "norm_config": {
+                        "lowercase": true,
+                        "norm_whitespace": true,
+                        "remove_punctuation": true,
+                        "norm_unicode_diacritics": true,
+                        "norm_numbers": true,
+                        "norm_weekdays": false,
+                        "norm_monthnames": false
+                    },
+                    "hash_config": {
+                        "precision": 64,
+                        "hash_fc": "xxhash"
+                    }
+                },
+                "num_hashes": 112,
+                "_parameters": null,
+                "_hash_func": "<function xxhash64 at 0x11a677a30>",
+                "language": "eng",
+                "word_tokenizer": "<datatrove.utils.word_tokenizers.SpaCyTokenizer object at 0x11999dcf0>",
+                "skip_existing_sigs": false
+            }
+        ],
+        [
+            {
+                "limit": -1,
+                "skip": 0,
+                "text_key": "text",
+                "id_key": "id",
+                "adapter": "<bound method BaseReader._default_adapter of \ud83d\udcd6 - READER: \ud83d\udc3f Jsonl>",
+                "_empty_warning": false,
+                "default_metadata": null,
+                "data_folder": "DataFolder(path='/Users/adrienloizeau/dev/scratchGPT/data', fs=<fsspec.implementations.local.LocalFileSystem object at 0x11a66dde0>)",
+                "paths_file": null,
+                "recursive": true,
+                "glob_pattern": null,
+                "shuffle_files": false,
+                "file_progress": false,
+                "doc_progress": false,
+                "compression": "infer"
+            },
+            {
+                "sample_size": 3
+            },
+            {
+                "exclusion_writer": null,
+                "batch_size": 1,
+                "language_threshold": 0.65,
+                "languages": [
+                    "en"
+                ],
+                "backend": "ft176",
+                "model": "<datatrove.utils.lid.FT176LID object at 0x118d3bc40>",
+                "label_only": false,
+                "keep_top_pairs_threshold": -1
+            },
+            {
+                "exclusion_writer": null,
+                "batch_size": 1,
+                "min_doc_words": 50,
+                "max_doc_words": 100000,
+                "min_avg_word_length": 3,
+                "max_avg_word_length": 10,
+                "max_symbol_word_ratio": 0.1,
+                "max_bullet_lines_ratio": 0.9,
+                "max_ellipsis_lines_ratio": 0.3,
+                "max_non_alpha_words_ratio": 0.8,
+                "min_stop_words": 2,
+                "stop_words": "{'and', 'to', 'of', 'with', 'that', 'have', 'be', 'the'}",
+                "language": "eng"
+            },
+            {
+                "sample_size": 3
+            },
+            {
+                "data_folder": "DataFolder(path='/Users/adrienloizeau/dev/scratchGPT/data/signatures', fs=<fsspec.implementations.local.LocalFileSystem object at 0x11a66dde0>)",
+                "exclusion_writer": null,
+                "load_cluster_ids": false,
+                "load_cluster_sizes": false,
+                "lines_to_buffer": 5
+            },
+            {
+                "compression": "gzip",
+                "output_folder": "DataFolder(path='/Users/adrienloizeau/dev/scratchGPT/data/cleaned_documents.jsonl', fs=<fsspec.implementations.local.LocalFileSystem object at 0x11a66dde0>)",
+                "max_file_size": -1,
+                "file_id_counter": {},
+                "output_filename": "<string.Template object at 0x11a66cdc0>",
+                "output_mg": "<datatrove.io.OutputFileManager object at 0x11a66f9d0>",
+                "adapter": "<bound method DiskWriter._default_adapter of \ud83d\udcbd - WRITER: \ud83d\udc3f Jsonl>",
+                "expand_metadata": false
+            }
+        ]
+    ],
+    "logging_dir": "DataFolder(path='/Users/adrienloizeau/dev/scratchGPT/logs/2025-05-02_11-19-53_sefyh', fs=<fsspec.implementations.local.LocalFileSystem object at 0x11a66dde0>)",
+    "skip_completed": true,
+    "randomize_start_duration": 0,
+    "tasks": 1,
+    "workers": 1,
+    "start_method": "forkserver",
+    "local_tasks": 1,
+    "local_rank_offset": 0,
+    "depends": null,
+    "_launched": true,
+    "world_size": 1
+}

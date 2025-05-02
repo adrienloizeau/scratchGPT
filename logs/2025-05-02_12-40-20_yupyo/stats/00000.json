@@ -1,0 +1,38 @@
+[
+    {
+        "name": "\ud83d\udcd6 - READER: \ud83d\udc3f Jsonl",
+        "time_stats": {
+            "total": 0.039733016514219344,
+            "n": 2553,
+            "mean": 1.5563265379639437e-05,
+            "variance": 1.7484022718040176e-07,
+            "std_dev": 0.0004181390046149746,
+            "min": 2.663990017026663e-06,
+            "max": 0.02108549204422161,
+            "total_human": "0 seconds",
+            "mean_human": "0.02 milliseconds",
+            "std_dev_human": "0.42 milliseconds",
+            "min_human": "0.00 milliseconds",
+            "max_human": "21.09 milliseconds"
+        },
+        "stats": {
+            "input_files": 1,
+            "documents": 0
+        }
+    },
+    {
+        "name": "None: None",
+        "time_stats": 0,
+        "stats": {}
+    },
+    {
+        "name": "\ud83d\udd3b - FILTER: \ud83c\udf0d Language ID",
+        "time_stats": 0,
+        "stats": {}
+    },
+    {
+        "name": "\ud83d\udcbd - WRITER: \ud83d\udc3f Jsonl",
+        "time_stats": 0,
+        "stats": {}
+    }
+]

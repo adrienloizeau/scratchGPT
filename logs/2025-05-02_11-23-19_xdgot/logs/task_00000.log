@@ -1,0 +1,13 @@
+2025-05-02 11:23:19.424 | INFO     | datatrove.utils.logging:add_task_logger:58 - Launching pipeline for rank=0
+2025-05-02 11:23:19.425 | INFO     | datatrove.utils.logging:log_pipeline:90 - 
+--- 🛠️ PIPELINE 🛠
+Iterable
+Iterable
+2025-05-02 11:23:19.426 | SUCCESS  | datatrove.executor.base:_run_for_rank:98 - Processing done for rank=0
+2025-05-02 11:23:19.431 | INFO     | datatrove.executor.base:_run_for_rank:104 - 
+
+📉📉📉 Stats: Task 0 📉📉📉
+
+Total Runtime: 0 seconds
+
+

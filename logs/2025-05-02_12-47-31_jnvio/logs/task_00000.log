@@ -1,0 +1,118 @@
+2025-05-02 12:47:31.311 | INFO     | datatrove.utils.logging:add_task_logger:58 - Launching pipeline for rank=0
+2025-05-02 12:47:31.312 | INFO     | datatrove.utils.logging:log_pipeline:90 - 
+--- 🛠️ PIPELINE 🛠
+📖 - READER: 🐿 Jsonl
+None: None
+None: None
+🔻 - FILTER: 🌍 Language ID
+💽 - WRITER: 🐿 Jsonl
+2025-05-02 12:47:31.355 | INFO     | datatrove.pipeline.readers.base:read_files_shard:201 - Reading input file {"title": "Why TVs / laptops etc. do not warn about too brirght screen whereas many smartphones warn about too loud sound amplification?", "body": "I'm trying to comfortably use my laptop at night and now could not find an answer by web-search to the following: Why TVs / laptops etc. do not warn about too bright screen whereas many smartphones warn about too loud sound amplification? I'm asking on law site cause I suspect there were a number of successful lawsuits for impaired hearing from headphones but none for impaired vision from TVs. Am I right here? Digging down - has it happened because there are studies proving impairment for one and none for the other?\n\n\nAdded: I actually doubt my second guess cause there are a lot of enhancements in screen brightness - auto-brightness, night mode.\n\n\n", "score": 0, "source": "law_stack_exchange"}, 1/2553
+2025-05-02 12:47:31.465 | ERROR    | datatrove.executor.base:_run_for_rank:108 - [Errno 2] No such file or directory: '/Users/adrienloizeau/dev/scratchGPT/data/{"title": "Why TVs / laptops etc. do not warn about too brirght screen whereas many smartphones warn about too loud sound amplification?", "body": "I\'m trying to comfortably use my laptop at night and now could not find an answer by web-search to the following: Why TVs / laptops etc. do not warn about too bright screen whereas many smartphones warn about too loud sound amplification? I\'m asking on law site cause I suspect there were a number of successful lawsuits for impaired hearing from headphones but none for impaired vision from TVs. Am I right here? Digging down - has it happened because there are studies proving impairment for one and none for the other?\\n\\n\\nAdded: I actually doubt my second guess cause there are a lot of enhancements in screen brightness - auto-brightness, night mode.\\n\\n\\n", "score": 0, "source": "law_stack_exchange"}'
+Traceback (most recent call last):
+
+  File "/Users/adrienloizeau/dev/scratchGPT/data_pipeline.py", line 77, in <module>
+    executor.run()
+    │        └ <function LocalPipelineExecutor.run at 0x126b0a050>
+    └ <datatrove.executor.local.LocalPipelineExecutor object at 0x126b15630>
+
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/datatrove/executor/local.py", line 127, in run
+    stats.append(self._launch_run_for_rank(rank, ranks_q))
+    │     │      │    │                    │     └ <AutoProxy[Queue] object, typeid 'Queue' at 0x126b16bf0>
+    │     │      │    │                    └ 0
+    │     │      │    └ <function LocalPipelineExecutor._launch_run_for_rank at 0x126b09fc0>
+    │     │      └ <datatrove.executor.local.LocalPipelineExecutor object at 0x126b15630>
+    │     └ <method 'append' of 'list' objects>
+    └ []
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/datatrove/executor/local.py", line 76, in _launch_run_for_rank
+    return self._run_for_rank(rank, local_rank)
+           │    │             │     └ 0
+           │    │             └ 0
+           │    └ <function PipelineExecutor._run_for_rank at 0x126b09bd0>
+           └ <datatrove.executor.local.LocalPipelineExecutor object at 0x126b15630>
+> File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/datatrove/executor/base.py", line 96, in _run_for_rank
+    deque(pipelined_data, maxlen=0)
+    │     └ <generator object DiskWriter.run at 0x126af7530>
+    └ <class 'collections.deque'>
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/datatrove/pipeline/writers/disk_base.py", line 178, in run
+    for document in data:
+                    └ <generator object BaseFilter.run at 0x126af7290>
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/datatrove/pipeline/filters/base_filter.py", line 64, in run
+    for batch in batched(data, self.batch_size):
+                 │       │     │    └ 1
+                 │       │     └ 🔻 - FILTER: 🌍 Language ID
+                 │       └ <generator object ScoreFilter.run at 0x126af60a0>
+                 └ <function batched at 0x1267bc160>
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/datatrove/utils/batching.py", line 20, in batched
+    while batch := list(itertools.islice(it, n)):
+                        │         │      │   └ 1
+                        │         │      └ <generator object ScoreFilter.run at 0x126af60a0>
+                        │         └ <class 'itertools.islice'>
+                        └ <module 'itertools' (built-in)>
+
+  File "/Users/adrienloizeau/dev/scratchGPT/data_pipeline.py", line 42, in run
+    for document in data:
+                    └ <generator object MergeFields.run at 0x126af6490>
+
+  File "/Users/adrienloizeau/dev/scratchGPT/data_pipeline.py", line 33, in run
+    for document in data:
+                    └ <generator object BaseDiskReader.run at 0x126af5ee0>
+
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/datatrove/pipeline/readers/base.py", line 245, in run
+    for doc in self.read_files_shard(files_shard):
+               │    │                └ ['{"title": "Why TVs / laptops etc. do not warn about too brirght screen whereas many smartphones warn about too loud sound a...
+               │    └ <function BaseDiskReader.read_files_shard at 0x1267a7250>
+               └ 📖 - READER: 🐿 Jsonl
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/datatrove/pipeline/readers/base.py", line 204, in read_files_shard
+    for di, document in enumerate(self.read_file(filepath)):
+        │                         │    │         └ '{"title": "Why TVs / laptops etc. do not warn about too brirght screen whereas many smartphones warn about too loud sound am...
+        │                         │    └ <function JsonlReader.read_file at 0x1267a7ac0>
+        │                         └ 📖 - READER: 🐿 Jsonl
+        └ 0
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/datatrove/pipeline/readers/jsonl.py", line 73, in read_file
+    with self.data_folder.open(filepath, "r", compression=self.compression) as f:
+         │    │           │    │                          │    └ None
+         │    │           │    │                          └ 📖 - READER: 🐿 Jsonl
+         │    │           │    └ '{"title": "Why TVs / laptops etc. do not warn about too brirght screen whereas many smartphones warn about too loud sound am...
+         │    │           └ <function DataFolder.open at 0x126771d80>
+         │    └ DataFolder(path='/Users/adrienloizeau/dev/scratchGPT/data', fs=<fsspec.implementations.local.LocalFileSystem object at 0x126b...
+         └ 📖 - READER: 🐿 Jsonl
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/datatrove/io.py", line 236, in open
+    return super().open(path, mode=mode, *args, **kwargs)
+                        │          │      │       └ {'compression': None}
+                        │          │      └ ()
+                        │          └ 'r'
+                        └ '{"title": "Why TVs / laptops etc. do not warn about too brirght screen whereas many smartphones warn about too loud sound am...
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/fsspec/implementations/dirfs.py", line 368, in open
+    return self.fs.open(
+           │    │  └ <function AbstractFileSystem.open at 0x10fa591b0>
+           │    └ <fsspec.implementations.local.LocalFileSystem object at 0x126b15450>
+           └ DataFolder(path='/Users/adrienloizeau/dev/scratchGPT/data', fs=<fsspec.implementations.local.LocalFileSystem object at 0x126b...
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/fsspec/spec.py", line 1298, in open
+    self.open(
+    │    └ <function AbstractFileSystem.open at 0x10fa591b0>
+    └ <fsspec.implementations.local.LocalFileSystem object at 0x126b15450>
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/fsspec/spec.py", line 1310, in open
+    f = self._open(
+        │    └ <function LocalFileSystem._open at 0x125feb7f0>
+        └ <fsspec.implementations.local.LocalFileSystem object at 0x126b15450>
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/fsspec/implementations/local.py", line 200, in _open
+    return LocalFileOpener(path, mode, fs=self, **kwargs)
+           │               │     │        │       └ {'autocommit': True, 'cache_options': None}
+           │               │     │        └ <fsspec.implementations.local.LocalFileSystem object at 0x126b15450>
+           │               │     └ 'rb'
+           │               └ '/Users/adrienloizeau/dev/scratchGPT/data/{"title": "Why TVs / laptops etc. do not warn about too brirght screen whereas many...
+           └ <class 'fsspec.implementations.local.LocalFileOpener'>
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/fsspec/implementations/local.py", line 364, in __init__
+    self._open()
+    │    └ <function LocalFileOpener._open at 0x125febe20>
+    └ <fsspec.implementations.local.LocalFileOpener object at 0x126bd50f0>
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/fsspec/implementations/local.py", line 369, in _open
+    self.f = open(self.path, mode=self.mode)
+    │    │        │    │          │    └ 'rb'
+    │    │        │    │          └ <fsspec.implementations.local.LocalFileOpener object at 0x126bd50f0>
+    │    │        │    └ '/Users/adrienloizeau/dev/scratchGPT/data/{"title": "Why TVs / laptops etc. do not warn about too brirght screen whereas many...
+    │    │        └ <fsspec.implementations.local.LocalFileOpener object at 0x126bd50f0>
+    │    └ None
+    └ <fsspec.implementations.local.LocalFileOpener object at 0x126bd50f0>
+
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/adrienloizeau/dev/scratchGPT/data/{"title": "Why TVs / laptops etc. do not warn about too brirght screen whereas many smartphones warn about too loud sound amplification?", "body": "I\'m trying to comfortably use my laptop at night and now could not find an answer by web-search to the following: Why TVs / laptops etc. do not warn about too bright screen whereas many smartphones warn about too loud sound amplification? I\'m asking on law site cause I suspect there were a number of successful lawsuits for impaired hearing from headphones but none for impaired vision from TVs. Am I right here? Digging down - has it happened because there are studies proving impairment for one and none for the other?\\n\\n\\nAdded: I actually doubt my second guess cause there are a lot of enhancements in screen brightness - auto-brightness, night mode.\\n\\n\\n", "score": 0, "source": "law_stack_exchange"}'

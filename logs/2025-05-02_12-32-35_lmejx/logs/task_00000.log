@@ -1,0 +1,103 @@
+2025-05-02 12:32:36.433 | INFO     | datatrove.utils.logging:add_task_logger:58 - Launching pipeline for rank=0
+2025-05-02 12:32:36.435 | INFO     | datatrove.utils.logging:log_pipeline:90 - 
+--- 🛠️ PIPELINE 🛠
+None: None
+None: None
+None: None
+🔻 - FILTER: 🌍 Language ID
+💽 - WRITER: 🐿 Jsonl
+2025-05-02 12:32:42.423 | ERROR    | datatrove.executor.base:_run_for_rank:108 - 'DocumentWrapper' object has no attribute 'metadata'
+Traceback (most recent call last):
+
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+           │         │     └ {'__name__': '__main__', '__doc__': None, '__package__': '', '__loader__': <_frozen_importlib_external.SourceFileLoader objec...
+           │         └ <code object <module> at 0x104b6a600, file "/Users/adrienloizeau/.vscode/extensions/ms-python.debugpy-2025.6.0-darwin-x64/bun...
+           └ <function _run_code at 0x104b775b0>
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+         │     └ {'__name__': '__main__', '__doc__': None, '__package__': '', '__loader__': <_frozen_importlib_external.SourceFileLoader objec...
+         └ <code object <module> at 0x104b6a600, file "/Users/adrienloizeau/.vscode/extensions/ms-python.debugpy-2025.6.0-darwin-x64/bun...
+
+  File "/Users/adrienloizeau/.vscode/extensions/ms-python.debugpy-2025.6.0-darwin-x64/bundled/libs/debugpy/adapter/../../debugpy/launcher/../../debugpy/__main__.py", line 71, in <module>
+    cli.main()
+    │   └ <function main at 0x10601cca0>
+    └ <module 'debugpy.server.cli' from '/Users/adrienloizeau/.vscode/extensions/ms-python.debugpy-2025.6.0-darwin-x64/bundled/libs...
+
+  File "/Users/adrienloizeau/.vscode/extensions/ms-python.debugpy-2025.6.0-darwin-x64/bundled/libs/debugpy/adapter/../../debugpy/launcher/../../debugpy/../debugpy/server/cli.py", line 501, in main
+    run()
+    └ <function run_file at 0x10601ca60>
+
+  File "/Users/adrienloizeau/.vscode/extensions/ms-python.debugpy-2025.6.0-darwin-x64/bundled/libs/debugpy/adapter/../../debugpy/launcher/../../debugpy/../debugpy/server/cli.py", line 351, in run_file
+    runpy.run_path(target, run_name="__main__")
+    │     │        └ '/Users/adrienloizeau/dev/scratchgpt/data_pipeline.py'
+    │     └ <function run_path at 0x10560d2d0>
+    └ <module '_pydevd_bundle.pydevd_runpy' from '/Users/adrienloizeau/.vscode/extensions/ms-python.debugpy-2025.6.0-darwin-x64/bun...
+
+  File "/Users/adrienloizeau/.vscode/extensions/ms-python.debugpy-2025.6.0-darwin-x64/bundled/libs/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 310, in run_path
+    return _run_module_code(code, init_globals, run_name, pkg_name=pkg_name, script_name=fname)
+           │                │     │             │                  │                     └ '/Users/adrienloizeau/dev/scratchgpt/data_pipeline.py'
+           │                │     │             │                  └ ''
+           │                │     │             └ '__main__'
+           │                │     └ None
+           │                └ <code object <module> at 0x106188710, file "/Users/adrienloizeau/dev/scratchgpt/data_pipeline.py", line 1>
+           └ <function _run_module_code at 0x10560cf70>
+
+  File "/Users/adrienloizeau/.vscode/extensions/ms-python.debugpy-2025.6.0-darwin-x64/bundled/libs/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 127, in _run_module_code
+    _run_code(code, mod_globals, init_globals, mod_name, mod_spec, pkg_name, script_name)
+    │         │     │            │             │         │         │         └ '/Users/adrienloizeau/dev/scratchgpt/data_pipeline.py'
+    │         │     │            │             │         │         └ ''
+    │         │     │            │             │         └ None
+    │         │     │            │             └ '__main__'
+    │         │     │            └ None
+    │         │     └ {'__name__': '__main__', '__doc__': None, '__package__': '', '__loader__': None, '__spec__': None, '__file__': '/Users/adrien...
+    │         └ <code object <module> at 0x106188710, file "/Users/adrienloizeau/dev/scratchgpt/data_pipeline.py", line 1>
+    └ <function _run_code at 0x10560cb80>
+
+  File "/Users/adrienloizeau/.vscode/extensions/ms-python.debugpy-2025.6.0-darwin-x64/bundled/libs/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 118, in _run_code
+    exec(code, run_globals)
+         │     └ {'__name__': '__main__', '__doc__': None, '__package__': '', '__loader__': None, '__spec__': None, '__file__': '/Users/adrien...
+         └ <code object <module> at 0x106188710, file "/Users/adrienloizeau/dev/scratchgpt/data_pipeline.py", line 1>
+
+  File "/Users/adrienloizeau/dev/scratchgpt/data_pipeline.py", line 60, in <module>
+    executor.run()
+    │        └ <function LocalPipelineExecutor.run at 0x11d0d6ef0>
+    └ <datatrove.executor.local.LocalPipelineExecutor object at 0x11d0f5f90>
+
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/datatrove/executor/local.py", line 127, in run
+    stats.append(self._launch_run_for_rank(rank, ranks_q))
+    │     │      │    │                    │     └ <AutoProxy[Queue] object, typeid 'Queue' at 0x11d0f6b30>
+    │     │      │    │                    └ 0
+    │     │      │    └ <function LocalPipelineExecutor._launch_run_for_rank at 0x11d0d6e60>
+    │     │      └ <datatrove.executor.local.LocalPipelineExecutor object at 0x11d0f5f90>
+    │     └ <method 'append' of 'list' objects>
+    └ []
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/datatrove/executor/local.py", line 76, in _launch_run_for_rank
+    return self._run_for_rank(rank, local_rank)
+           │    │             │     └ 0
+           │    │             └ 0
+           │    └ <function PipelineExecutor._run_for_rank at 0x11d0d6a70>
+           └ <datatrove.executor.local.LocalPipelineExecutor object at 0x11d0f5f90>
+> File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/datatrove/executor/base.py", line 96, in _run_for_rank
+    deque(pipelined_data, maxlen=0)
+    │     └ <generator object DiskWriter.run at 0x11d0f1d90>
+    └ <class 'collections.deque'>
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/datatrove/pipeline/writers/disk_base.py", line 178, in run
+    for document in data:
+                    └ <generator object BaseFilter.run at 0x11d0f3990>
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/datatrove/pipeline/filters/base_filter.py", line 68, in run
+    batch_filter_result = self.filter_batch(batch)
+                          │    │            └ [<__main__.DocumentWrapper object at 0x11d2e5e70>]
+                          │    └ <function BaseFilter.filter_batch at 0x11d00c430>
+                          └ 🔻 - FILTER: 🌍 Language ID
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/datatrove/pipeline/filters/base_filter.py", line 60, in filter_batch
+    return list(map(self.filter, batch))
+                    │    │       └ [<__main__.DocumentWrapper object at 0x11d2e5e70>]
+                    │    └ <function LanguageFilter.filter at 0x11d0d5ab0>
+                    └ 🔻 - FILTER: 🌍 Language ID
+  File "/Users/adrienloizeau/opt/anaconda3/envs/lerobot/lib/python3.10/site-packages/datatrove/pipeline/filters/language_filter.py", line 55, in filter
+    doc.metadata["language"] = lang
+    │                          └ 'en'
+    └ <__main__.DocumentWrapper object at 0x11d2e5e70>
+
+AttributeError: 'DocumentWrapper' object has no attribute 'metadata'

@@ -1,0 +1,26 @@
+2025-05-02 12:52:19.087 | INFO     | datatrove.utils.logging:add_task_logger:58 - Launching pipeline for rank=0
+2025-05-02 12:52:19.089 | INFO     | datatrove.utils.logging:log_pipeline:90 - 
+--- 🛠️ PIPELINE 🛠
+📖 - READER: 🐿 Jsonl
+None: None
+🔻 - FILTER: 🌍 Language ID
+💽 - WRITER: 🐿 Jsonl
+2025-05-02 12:52:19.094 | INFO     | datatrove.pipeline.readers.base:read_files_shard:201 - Reading input file law_stack_exchange.jsonl, 1/2
+2025-05-02 12:52:22.828 | INFO     | datatrove.pipeline.readers.base:read_files_shard:201 - Reading input file raw/law_stack_exchange.jsonl, 2/2
+2025-05-02 12:52:22.830 | WARNING  | datatrove.pipeline.readers.base:get_document_from_dict:93 - Found document without text, skipping. Is your `text_key` ("text") correct? Available keys: ['title', 'body', 'score', 'source']
+2025-05-02 12:52:22.957 | SUCCESS  | datatrove.executor.base:_run_for_rank:98 - Processing done for rank=0
+2025-05-02 12:52:22.965 | INFO     | datatrove.executor.base:_run_for_rank:104 - 
+
+📉📉📉 Stats: Task 0 📉📉📉
+
+Total Runtime: 3 seconds
+
+📖 - READER: 🐿 Jsonl
+    Runtime: (3.15%) 0 seconds [0.04 milliseconds±0.88 milliseconds/doc]
+    Stats: {input_files: 2, doc_len: 355695 [min=184, max=5314, 985.30±754/doc], documents: 361 [min=0, max=361, 180.50±255/input_file]}
+🔻 - FILTER: 🌍 Language ID
+    Runtime: (93.42%) 3 seconds [9.52 milliseconds±121.99 milliseconds/doc]
+    Stats: {total: 361, forwarded: 361, doc_len: 355695 [min=184, max=5314, 985.30±754/doc]}
+💽 - WRITER: 🐿 Jsonl
+    Runtime: (3.43%) 0 seconds [0.35 milliseconds±1.30 milliseconds/doc]
+    Stats: {cleaned_documents.jsonl: 361, total: 361, doc_len: 355695 [min=184, max=5314, 985.30±754/doc]}

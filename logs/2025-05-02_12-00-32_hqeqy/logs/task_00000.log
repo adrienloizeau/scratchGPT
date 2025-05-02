@@ -1,0 +1,24 @@
+2025-05-02 12:00:32.458 | INFO     | datatrove.utils.logging:add_task_logger:58 - Launching pipeline for rank=0
+2025-05-02 12:00:32.460 | INFO     | datatrove.utils.logging:log_pipeline:90 - 
+--- 🛠️ PIPELINE 🛠
+📖 - READER: 🐿 Jsonl
+🔻 - FILTER: 🌍 Language ID
+💽 - WRITER: 🐿 Jsonl
+2025-05-02 12:00:32.480 | INFO     | tmp.local_base:read_files_shard:201 - Reading input file 00000.jsonl.gz, 1/2
+2025-05-02 12:00:35.937 | INFO     | tmp.local_base:read_files_shard:201 - Reading input file law_stack_exchange.jsonl, 2/2
+2025-05-02 12:00:36.812 | SUCCESS  | datatrove.executor.base:_run_for_rank:98 - Processing done for rank=0
+2025-05-02 12:00:36.816 | INFO     | datatrove.executor.base:_run_for_rank:104 - 
+
+📉📉📉 Stats: Task 0 📉📉📉
+
+Total Runtime: 4 seconds
+
+📖 - READER: 🐿 Jsonl
+    Runtime: (0.92%) 0 seconds [0.05 milliseconds±0.25 milliseconds/doc]
+    Stats: {input_files: 2, doc_len: 711390 [min=184, max=5314, 985.30±753/doc], documents: 722 [361.00/input_file]}
+🔻 - FILTER: 🌍 Language ID
+    Runtime: (93.00%) 3 seconds [5.30 milliseconds±66.55 milliseconds/doc]
+    Stats: {total: 722, forwarded: 722, doc_len: 711390 [min=184, max=5314, 985.30±753/doc]}
+💽 - WRITER: 🐿 Jsonl
+    Runtime: (6.09%) 0 seconds [0.35 milliseconds±1.68 milliseconds/doc]
+    Stats: {cleaned_documents.jsonl.gz: 722, total: 722, doc_len: 711390 [min=184, max=5314, 985.30±753/doc]}

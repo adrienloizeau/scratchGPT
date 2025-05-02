@@ -1,0 +1,26 @@
+2025-05-02 12:54:42.974 | INFO     | datatrove.utils.logging:add_task_logger:58 - Launching pipeline for rank=0
+2025-05-02 12:54:42.974 | INFO     | datatrove.utils.logging:log_pipeline:90 - 
+--- 🛠️ PIPELINE 🛠
+📖 - READER: 🐿 Jsonl
+None: None
+🔻 - FILTER: 🌍 Language ID
+💽 - WRITER: 🐿 Jsonl
+2025-05-02 12:54:42.989 | INFO     | datatrove.pipeline.readers.base:read_files_shard:201 - Reading input file cleaned_documents.jsonl, 1/2
+2025-05-02 12:54:44.850 | WARNING  | datatrove.pipeline.readers.jsonl:read_file:82 - Error when reading `cleaned_documents.jsonl`: unexpected end of data: line 1 column 1166 (char 1165)
+2025-05-02 12:54:44.850 | INFO     | datatrove.pipeline.readers.base:read_files_shard:201 - Reading input file law_stack_exchange.jsonl, 2/2
+2025-05-02 12:54:46.917 | SUCCESS  | datatrove.executor.base:_run_for_rank:98 - Processing done for rank=0
+2025-05-02 12:54:46.921 | INFO     | datatrove.executor.base:_run_for_rank:104 - 
+
+📉📉📉 Stats: Task 0 📉📉📉
+
+Total Runtime: 3 seconds
+
+📖 - READER: 🐿 Jsonl
+    Runtime: (1.57%) 0 seconds [0.02 milliseconds±0.31 milliseconds/doc]
+    Stats: {input_files: 2, doc_len: 2194112 [min=102, max=7807, 857.75±699/doc], documents: 2558 [min=5, max=2553, 1279.00±1802/input_file]}
+🔻 - FILTER: 🌍 Language ID
+    Runtime: (96.13%) 3 seconds [3.73 milliseconds±56.91 milliseconds/doc]
+    Stats: {total: 983, forwarded: 983, doc_len: 878134 [min=102, max=5314, 893.32±662/doc]}
+💽 - WRITER: 🐿 Jsonl
+    Runtime: (2.29%) 0 seconds [0.09 milliseconds±0.18 milliseconds/doc]
+    Stats: {cleaned_documents.jsonl: 983, total: 983, doc_len: 878134 [min=102, max=5314, 893.32±662/doc]}

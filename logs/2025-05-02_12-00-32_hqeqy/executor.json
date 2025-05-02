@@ -1,0 +1,38 @@
+{
+    "pipeline": [
+        "\ud83d\udcd6 - READER: \ud83d\udc3f Jsonl",
+        {
+            "exclusion_writer": null,
+            "batch_size": 1,
+            "language_threshold": 0.65,
+            "languages": [
+                "en"
+            ],
+            "backend": "ft176",
+            "model": "<datatrove.utils.lid.FT176LID object at 0x1219dad10>",
+            "label_only": false,
+            "keep_top_pairs_threshold": -1
+        },
+        {
+            "compression": "gzip",
+            "output_folder": "DataFolder(path='/Users/adrienloizeau/dev/scratchGPT/data', fs=<fsspec.implementations.local.LocalFileSystem object at 0x1219d8df0>)",
+            "max_file_size": -1,
+            "file_id_counter": {},
+            "output_filename": "<string.Template object at 0x1219dac50>",
+            "output_mg": "<datatrove.io.OutputFileManager object at 0x1219dace0>",
+            "adapter": "<bound method DiskWriter._default_adapter of \ud83d\udcbd - WRITER: \ud83d\udc3f Jsonl>",
+            "expand_metadata": false
+        }
+    ],
+    "logging_dir": "DataFolder(path='/Users/adrienloizeau/dev/scratchGPT/logs/2025-05-02_12-00-32_hqeqy', fs=<fsspec.implementations.local.LocalFileSystem object at 0x1219d8df0>)",
+    "skip_completed": true,
+    "randomize_start_duration": 0,
+    "tasks": 1,
+    "workers": 1,
+    "start_method": "forkserver",
+    "local_tasks": 1,
+    "local_rank_offset": 0,
+    "depends": null,
+    "_launched": true,
+    "world_size": 1
+}

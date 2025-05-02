@@ -1,0 +1,25 @@
+2025-05-02 11:59:39.204 | INFO     | datatrove.utils.logging:add_task_logger:58 - Launching pipeline for rank=0
+2025-05-02 11:59:39.205 | INFO     | datatrove.utils.logging:log_pipeline:90 - 
+--- 🛠️ PIPELINE 🛠
+📖 - READER: 🐿 Jsonl
+🔻 - FILTER: 🌍 Language ID
+💽 - WRITER: 🐿 Jsonl
+2025-05-02 11:59:39.222 | INFO     | tmp.local_base:read_files_shard:201 - Reading input file law_stack_exchange.jsonl, 1/1
+2025-05-02 11:59:40.554 | INFO     | datatrove.io:do_download_file:396 - ⬇️ Downloading fast-text language identifier model from "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.bin"...
+2025-05-02 11:59:44.625 | INFO     | datatrove.io:do_download_file:398 - ⬇️ Downloaded fast-text language identifier model to "/Users/adrienloizeau/.cache/huggingface/assets/datatrove/lid/ft176/https:__dl.fbaipublicfiles.com_fasttext_supervised-models_lid.176.bin".
+2025-05-02 11:59:46.673 | SUCCESS  | datatrove.executor.base:_run_for_rank:98 - Processing done for rank=0
+2025-05-02 11:59:46.675 | INFO     | datatrove.executor.base:_run_for_rank:104 - 
+
+📉📉📉 Stats: Task 0 📉📉📉
+
+Total Runtime: 7 seconds
+
+📖 - READER: 🐿 Jsonl
+    Runtime: (0.16%) 0 seconds [0.03 milliseconds±0.06 milliseconds/doc]
+    Stats: {input_files: 1, doc_len: 355695 [min=184, max=5314, 985.30±754/doc], documents: 361 [361.00/input_file]}
+🔻 - FILTER: 🌍 Language ID
+    Runtime: (98.41%) 7 seconds [19.81 milliseconds±335.02 milliseconds/doc]
+    Stats: {total: 361, forwarded: 361, doc_len: 355695 [min=184, max=5314, 985.30±754/doc]}
+💽 - WRITER: 🐿 Jsonl
+    Runtime: (1.43%) 0 seconds [0.29 milliseconds±1.20 milliseconds/doc]
+    Stats: {XXXXX.jsonl.gz: 361, total: 361, doc_len: 355695 [min=184, max=5314, 985.30±754/doc]}
