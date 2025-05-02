@@ -1,9 +1,8 @@
 import json
-import datasets
+from datasets import load_dataset
 from datatrove.pipeline.readers import JsonlReader
 from datatrove.pipeline.base import PipelineStep
-from datatrove.pipeline.filters import LanguageFilter, GopherQualityFilter, GopherRepetitionFilter
-from datatrove.pipeline.dedup import MinhashDedupSignature, MinhashDedupFilter
+from datatrove.pipeline.filters import LanguageFilter
 from datatrove.pipeline.writers import JsonlWriter
 from datatrove.executor import LocalPipelineExecutor
 from tqdm import tqdm
@@ -27,11 +26,6 @@ def save_dataset(ds: list, path: str):
             json.dump(item, f)
             f.write("\n")
 
-class MergeFields(PipelineStep):
-    def run(self, data, rank: int = 0, world_size: int = 1):
-        for document in data:
-            document["text"] = f"{document['title']}\n{document['body']}"
-            yield document
 
 class ScoreFilter(PipelineStep):
     def __init__(self, min_score: int):
@@ -39,26 +33,38 @@ class ScoreFilter(PipelineStep):
 
     def run(self, data, rank: int = 0, world_size: int = 1):
         for document in data:
-            if int(document.metadata["score"]) > self.min_score:
+            if "score" in document.metadata:
+                if int(document.metadata["score"]) > self.min_score:
+                    yield document
+            else:   
                 yield document
 
-# Path configuration
+# Law Stack Exchange dataset
 save_dataset_path = "data/law_stack_exchange.jsonl"
 signatures_folder = "data/signatures" 
 output_path = "data/cleaned_documents.jsonl"
 
-# Uncomment to process and save raw data
-# ds = datasets.load_dataset("jonathanli/law-stack-exchange")
-# stacked_ds = stack_dataset(ds)
-# save_dataset(stacked_ds, save_dataset_path)
+ds = load_dataset("jonathanli/law-stack-exchange")
+stacked_ds = stack_dataset(ds)
+
+# Fineweb dataset
+save_dataset_path = "data/fineweb.jsonl"
+output_path = "cleaned_dataset.jsonl"
+ds = load_dataset("HuggingFaceFW/fineweb", "CC-MAIN-2013-48", split="train", streaming=True)
+stacked_ds = []
+for i, example in enumerate(ds):
+    if i >= 10000:  # Stop after 1000 examples (adjust based on your needs)
+        break
+    stacked_ds.append(example)
+
+save_dataset(stacked_ds, save_dataset_path)
+
 
 pipeline = [
     JsonlReader(data_folder="data"),
-    ScoreFilter(min_score=1), # Minimum score filter
-    # GopherQualityFilter(),  # no gpu 
-    # GopherRepetitionFilter(),  # no gpu 
+    ScoreFilter(min_score=1), # Filter out low-score documents
     LanguageFilter(languages="en"),
-    JsonlWriter(output_folder="data", output_filename="cleaned_documents.jsonl", compression=None),
+    JsonlWriter(output_folder="data", output_filename=output_path, compression=None),
 ]
 executor = LocalPipelineExecutor(pipeline=pipeline, tasks=1, workers=1)
 executor.run()

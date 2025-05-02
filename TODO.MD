@@ -12,16 +12,16 @@
 # Pretraining
 [ ] Ajouter instruct
 
-# Mid training 
-[ ] Infuse some knownledge
+<!-- # Mid training 
+[ ] Infuse some knownledge -->
 
 # Post training
 [ ] Instruct 
 [ ] DPO
 
-[ ] Changer de tokenizer --> 30 min
+<!-- [ ] Changer de tokenizer --> 30 min -->
 
-[ ] Lire Deepseek R1 --> 2H
+[ ] Lire Deepseek R1 
 
 [ ] Ajouter le FT -> 3h
     [ ] FT instruct sur Tulu -> 2h: peut etre changer de dataset 

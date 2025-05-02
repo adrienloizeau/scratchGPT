@@ -5,26 +5,25 @@ import torch.nn.functional as F
 import numpy as np
 from datasets import load_dataset
 from tqdm import tqdm
-
-
-# Hyperparameters
-learning_rate = 1e-2
-block_size = 8 # Maximum context length
-batch_size = 16 # nb of indepedant blocks fead to the model in parallel
-max_iters = 10000
-eval_interval = 300
-device = "cuda" if torch.cuda.is_available() else "cpu"
-eval_iters = 200
-n_embd = 32
-nb_heads = 4
-nb_layers = 4
-save_path = "model.pt"
-mode = "scratch"
+from configs.config import BaseConfig, LargeConfig
 
 # Set the random seed for reproducibility
 torch.manual_seed(123)
 
-
+config = BaseConfig()  # or LargeConfig() for larger model
+# Hyperparameters
+learning_rate = config.learning_rate
+block_size = config.block_size  # Maximum context length
+batch_size = config.batch_size  # Number of independent blocks fed to the model in parallel
+max_iters = config.max_iters
+eval_interval = config.eval_interval
+device = config.device
+eval_iters = config.eval_iters
+save_path = config.save_path
+mode = config.mode
+n_embd = config.n_embd
+nb_heads = config.nb_heads
+nb_layers = config.nb_layers
 
 class CharTokenizer(nn.Module):
     def __init__(self, dataset):
@@ -233,7 +232,11 @@ if __name__ == "__main__":
     print("Loss: ", loss.item())
 
     print("Training finished, generating text...")
-    context = torch.zeros((1,1), dtype = torch.long).to(device)
-    print(tokenizer.decode(m.generate(context, max_new_tokens = 500)[0]))
+    custom_text = input("Enter custom text to start generation (leave empty for random): ")
+    if custom_text:
+        context = tokenizer.encode(custom_text).unsqueeze(0).to(device)
+    else:
+        context = torch.zeros((1, 1), dtype=torch.long).to(device)
+    print(tokenizer.decode(m.generate(context, max_new_tokens=500)[0]))
 
     # print("x shape: ", x.shape)
