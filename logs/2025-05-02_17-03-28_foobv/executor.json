@@ -1,0 +1,72 @@
+{
+    "pipeline": [
+        {
+            "limit": -1,
+            "skip": 0,
+            "text_key": "text",
+            "id_key": "id",
+            "adapter": "<bound method BaseReader._default_adapter of \ud83d\udcd6 - READER: \ud83d\udc3f Jsonl>",
+            "_empty_warning": false,
+            "default_metadata": null,
+            "data_folder": "DataFolder(path='/home/ubuntu/aloizeaunanogpt/scratchGPT/data', fs=<fsspec.implementations.local.LocalFileSystem object at 0x7c94d91b31f0>)",
+            "paths_file": null,
+            "recursive": true,
+            "glob_pattern": null,
+            "shuffle_files": false,
+            "file_progress": false,
+            "doc_progress": false,
+            "compression": "infer"
+        },
+        {
+            "min_score": 1
+        },
+        {
+            "exclusion_writer": null,
+            "batch_size": 1,
+            "language_threshold": 0.65,
+            "languages": [
+                "en"
+            ],
+            "backend": "ft176",
+            "model": "<datatrove.utils.lid.FT176LID object at 0x7c947ba6ea70>",
+            "label_only": false,
+            "keep_top_pairs_threshold": -1
+        },
+        {
+            "exclusion_writer": null,
+            "batch_size": 1,
+            "min_doc_words": 50,
+            "max_doc_words": 100000,
+            "min_avg_word_length": 3,
+            "max_avg_word_length": 10,
+            "max_symbol_word_ratio": 0.1,
+            "max_bullet_lines_ratio": 0.9,
+            "max_ellipsis_lines_ratio": 0.3,
+            "max_non_alpha_words_ratio": 0.8,
+            "min_stop_words": 2,
+            "stop_words": "{'the', 'of', 'be', 'that', 'and', 'to', 'have', 'with'}",
+            "language": "eng"
+        },
+        {
+            "compression": null,
+            "output_folder": "DataFolder(path='/home/ubuntu/aloizeaunanogpt/scratchGPT/data', fs=<fsspec.implementations.local.LocalFileSystem object at 0x7c94d91b31f0>)",
+            "max_file_size": -1,
+            "file_id_counter": {},
+            "output_filename": "<string.Template object at 0x7c947ba6f6d0>",
+            "output_mg": "<datatrove.io.OutputFileManager object at 0x7c947ba6e770>",
+            "adapter": "<bound method DiskWriter._default_adapter of \ud83d\udcbd - WRITER: \ud83d\udc3f Jsonl>",
+            "expand_metadata": false
+        }
+    ],
+    "logging_dir": "DataFolder(path='/home/ubuntu/aloizeaunanogpt/scratchGPT/logs/2025-05-02_17-03-28_foobv', fs=<fsspec.implementations.local.LocalFileSystem object at 0x7c94d91b31f0>)",
+    "skip_completed": true,
+    "randomize_start_duration": 0,
+    "tasks": 1,
+    "workers": 1,
+    "start_method": "forkserver",
+    "local_tasks": 1,
+    "local_rank_offset": 0,
+    "depends": null,
+    "_launched": true,
+    "world_size": 1
+}

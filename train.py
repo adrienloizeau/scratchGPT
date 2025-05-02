@@ -6,11 +6,13 @@ import numpy as np
 from datasets import load_dataset
 from tqdm import tqdm
 from configs.config import BaseConfig, LargeConfig
+from model import Model, CharTokenizer, Block, MultiHeadAttention, FeedForward, Head
+import os
 
 # Set the random seed for reproducibility
 torch.manual_seed(123)
 
-config = BaseConfig()  # or LargeConfig() for larger model
+config = LargeConfig()  # or LargeConfig() for larger model
 # Hyperparameters
 learning_rate = config.learning_rate
 block_size = config.block_size  # Maximum context length
@@ -25,144 +27,6 @@ n_embd = config.n_embd
 nb_heads = config.nb_heads
 nb_layers = config.nb_layers
 
-class CharTokenizer(nn.Module):
-    def __init__(self, dataset):
-        super(CharTokenizer, self).__init__()
-        self.chars = sorted(list(set(dataset)))
-        self.encode_dict = { c:i for i,c in enumerate(self.chars)}
-        self.decode_dict = { i:c for i,c in enumerate(self.chars)}
-        self.vocab_size = len(self.chars)
-
-    def encode(self, text):
-        return torch.tensor([self.encode_dict[c] for c in text], dtype=torch.long)
-
-    def decode(self, indices):
-        return ''.join([self.decode_dict[i.item()] for i in indices])
-
-
-class Head(nn.Module):
-    def __init__(self, head_size):
-        super(Head, self).__init__()
-        self.key = nn.Linear(n_embd, head_size, bias=False) # keeps information about the token
-        self.query = nn.Linear(n_embd, head_size, bias=False) # keeps information about the position
-        self.value = nn.Linear(n_embd, head_size, bias=False) # keeps information about the value of each token to the position
-        self.register_buffer("tril", torch.tril(torch.ones(block_size, block_size)))
-        self.dropout = nn.Dropout(0.2)
-        self.head_size = head_size
-        self.scale = head_size ** -0.5
-
-    def forward(self, x):
-        B, T, C = x.shape
-        k = self.key(x) # (B, T, C)
-        q = self.query(x) # (B, T, C)
-        v = self.value(x) # (B, T, C)
-        # compute attention scores 
-        wei = (q @ k.transpose(-2, -1)) * self.scale # scale for numerical stability
-        # mask out the future positions
-        mask = self.tril[:T, :T].unsqueeze(0) # create a mask of shape (1, T, T)
-        wei = wei.masked_fill(mask == 0, float("-inf")) # masks the future positions
-        # apply softmax to get the attention weights
-        wei = F.softmax(wei, dim=-1)
-        wei = self.dropout(wei)
-        out = wei @ v
-        return out
-    
-
-class MultiHeadAttention(nn.Module):
-    def __init__(self, head_size, num_heads):
-        super(MultiHeadAttention, self).__init__()
-        self.heads = nn.ModuleList([Head(head_size) for _ in range(num_heads)])
-        self.dropout = nn.Dropout(0.2)
-        self.proj = nn.Linear(n_embd, n_embd)
-    def forward(self, x):
-        out = torch.cat([h(x) for h in self.heads], dim=-1)
-        out = self.proj(out)
-        out = self.dropout(out)
-        return out
-    
-
-class FeedForward(nn.Module):
-    def __init__(self, n_embd):
-        super(FeedForward, self).__init__()
-        self.net = nn.Sequential(
-            nn.Linear(n_embd, 4*n_embd),
-            nn.ReLU(),
-            nn.Linear(4*n_embd, n_embd),
-            nn.Dropout(0.2)
-        )
-
-    def forward(self, x):
-        return self.net(x)
-
-
-class Block(nn.Module):
-    def __init__(self, n_embd, n_heads):
-        super().__init__()
-        head_size = n_embd // n_heads
-        self.sa = MultiHeadAttention(head_size, n_heads)
-        self.ffwd = FeedForward(n_embd)
-        self.ln1 = nn.LayerNorm(n_embd)
-        self.ln2 = nn.LayerNorm(n_embd)
-
-    def forward(self, x):
-        x = x + self.sa(self.ln1(x)) 
-        x = x + self.ffwd(self.ln2(x))
-        return x
-    
-class Model(nn.Module):
-    def __init__(self, vocab_size, block_size= 8, n_embd=32, nb_heads=4, nb_layers=4):
-        super(Model,self).__init__()
-        # table of vocab_size x vocab_size to predict the next token only based on the current token
-        self.token_embedding_table = nn.Embedding(vocab_size,n_embd)         
-        self.positionnal_embedding_table = nn.Embedding(block_size, n_embd)
-        self.sa_blocks = nn.Sequential(*[Block(n_embd, nb_heads) for _ in range(nb_layers)]) # 4 blocks of self attention
-        self.ln = nn.LayerNorm(n_embd)
-        self.feed_forward = FeedForward(n_embd)
-        self.lm_head = nn.Linear(n_embd, vocab_size)
-        # self.embedding_out = nn.Embedding(n_emb, block_size)
-     
-    def forward(self, idx, target = None):
-        # For each idx in the batch we get the corresponding token
-        # and compare it to the target
-        # We theregore have the idx information and the positionnal information
-        # idx (B, T) 
-        # target (B, T)
-
-        B, T = idx.shape
-        token_embedding = self.token_embedding_table(idx) # (B, T, C)
-        pos_embedding = self.positionnal_embedding_table(torch.arange(T, device = device)) # (T, C)
-        x = token_embedding + pos_embedding # (B, T, C)
-        x=  self.sa_blocks(x)
-        x = self.ln(x) # (B, T, C)
-        x = self.feed_forward(x) # (B, T, C)
-        logits = self.lm_head(x) # (B, T, vocab_size)
-        
-        if target is not None: 
-            B, T, C = logits.shape
-            logits = logits.view(B * T, C) 
-            loss = F.cross_entropy(logits, target.view(-1)) # Negative Log Likelihood Loss on all possible classes
-            return logits, loss
-        else:
-            loss = None
-            return logits, loss
-
-
-    def generate(self, idx, max_new_tokens):
-        # idx is (B, T) array of indices in the current context
-        for _ in range(max_new_tokens):
-
-            idx_cond = idx[:, -block_size:] # (B, T) -> (B, block_size)
-            logits, loss = self(idx_cond)
-            # Focus only on the last time step -> so has all the block_size
-            logits = logits[:, -1, :] # becomes (B, C)
-            # apply softmax to get probs
-            probs = F.softmax(logits, dim = 1) # (B, C)
-
-            idx_next = torch.multinomial(probs, num_samples=1) # (B, 1)
-            # append sampled index to the running sequence
-            idx = torch.cat((idx, idx_next), dim=1) # (B, T+1)
-        return idx
-    
 
 @torch.no_grad()
 def estimate_loss(split):
@@ -189,15 +53,28 @@ def get_batch(split):
 
 
 if __name__ == "__main__":
+    import wandb
+    wandb.init(
+        project="finetune-instruct",
+        config={
+            "learning_rate": learning_rate,
+            "batch_size": batch_size,
+            "block_size": block_size,
+            "n_embd": n_embd,
+            "nb_heads": nb_heads,
+            "nb_layers": nb_layers,
+        }
+    )
     # Load the dataset, clean and split it
-    dataset_path = "data/cleaned_documents.jsonl"
+    dataset_path = "data/cleaned_dataset.jsonl"
     ds = load_dataset("json", data_files=dataset_path)["train"]["text"]
     ds = ''.join(ds)
-    split_size = int(0.8 * len(ds))
+    split_size = int(0.8 * len(ds)) 
     train_data, val_data = ds[:split_size], ds[split_size:]
 
     # Initialize the Tokenizer and DataLoader
     tokenizer = CharTokenizer(ds)
+    tokenizer.save("tokenizer_training.txt")
 
     train_data = tokenizer.encode(train_data)
     val_data = tokenizer.encode(val_data)
@@ -221,10 +98,13 @@ if __name__ == "__main__":
             print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
             if losses['val'] < best_val:
                 best_val = losses['val']
+                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+                print(f"Saving model to {save_path}")
                 torch.save(m, save_path)
 
         x, y = get_batch('train')
         logits, loss = m(x,y)
+        wandb.log({"train_loss": loss.item(), "iteration": iter, "val_loss": losses['val']})
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
         optimizer.step()    
@@ -238,5 +118,3 @@ if __name__ == "__main__":
     else:
         context = torch.zeros((1, 1), dtype=torch.long).to(device)
     print(tokenizer.decode(m.generate(context, max_new_tokens=500)[0]))
-
-    # print("x shape: ", x.shape)

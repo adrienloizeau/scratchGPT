@@ -2,7 +2,7 @@ import json
 from datasets import load_dataset
 from datatrove.pipeline.readers import JsonlReader
 from datatrove.pipeline.base import PipelineStep
-from datatrove.pipeline.filters import LanguageFilter
+from datatrove.pipeline.filters import LanguageFilter, GopherQualityFilter
 from datatrove.pipeline.writers import JsonlWriter
 from datatrove.executor import LocalPipelineExecutor
 from tqdm import tqdm
@@ -64,6 +64,7 @@ pipeline = [
     JsonlReader(data_folder="data"),
     ScoreFilter(min_score=1), # Filter out low-score documents
     LanguageFilter(languages="en"),
+    # GopherQualityFilter(),
     JsonlWriter(output_folder="data", output_filename=output_path, compression=None),
 ]
 executor = LocalPipelineExecutor(pipeline=pipeline, tasks=1, workers=1)

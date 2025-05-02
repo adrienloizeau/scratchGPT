@@ -20,11 +20,11 @@ class LargeConfig:
     learning_rate = 3e-4
     block_size = 256 # Maximum context length
     batch_size = 64 # nb of indepedant blocks fead o the model in parallel
-    max_iters = 5000
+    max_iters = 10000
     eval_interval = 300
     device = "cuda" if torch.cuda.is_available() else "cpu"
     eval_iters = 200
-    save_path = "model.pt"
+    save_path = "weights/model.pt"
     mode = "scratch"
     n_embd = 384
     nb_heads = 6

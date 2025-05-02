@@ -1,0 +1,28 @@
+2025-05-02 16:26:26.717 | INFO     | datatrove.utils.logging:add_task_logger:58 - Launching pipeline for rank=0
+2025-05-02 16:26:26.717 | INFO     | datatrove.utils.logging:log_pipeline:90 - 
+--- 🛠️ PIPELINE 🛠
+📖 - READER: 🐿 Jsonl
+None: None
+🔻 - FILTER: 🌍 Language ID
+💽 - WRITER: 🐿 Jsonl
+2025-05-02 16:26:26.726 | INFO     | datatrove.pipeline.readers.base:read_files_shard:201 - Reading input file cleaned_documents.jsonl, 1/3
+2025-05-02 16:26:26.739 | INFO     | datatrove.io:do_download_file:396 - ⬇️ Downloading fast-text language identifier model from "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.bin"...
+2025-05-02 16:26:27.306 | INFO     | datatrove.io:do_download_file:398 - ⬇️ Downloaded fast-text language identifier model to "/home/ubuntu/.cache/huggingface/assets/datatrove/lid/ft176/https:__dl.fbaipublicfiles.com_fasttext_supervised-models_lid.176.bin".
+2025-05-02 16:26:27.848 | INFO     | datatrove.pipeline.readers.base:read_files_shard:201 - Reading input file fineweb.jsonl, 2/3
+2025-05-02 16:26:33.640 | INFO     | datatrove.pipeline.readers.base:read_files_shard:201 - Reading input file law_stack_exchange.jsonl, 3/3
+2025-05-02 16:26:34.118 | SUCCESS  | datatrove.executor.base:_run_for_rank:98 - Processing done for rank=0
+2025-05-02 16:26:34.131 | INFO     | datatrove.executor.base:_run_for_rank:104 - 
+
+📉📉📉 Stats: Task 0 📉📉📉
+
+Total Runtime: 6 seconds
+
+📖 - READER: 🐿 Jsonl
+    Runtime: (3.37%) 0 seconds [0.02 milliseconds±0.01 milliseconds/doc]
+    Stats: {input_files: 3, doc_len: 31275771 [min=102, max=169220, 2310.56±5061/doc], documents: 13536 [min=983, max=10000, 4512.00±4817/input_file], doc_len_tokens: 6430813 [min=37, max=37099, 643.08±1344/doc]}
+🔻 - FILTER: 🌍 Language ID
+    Runtime: (84.67%) 5 seconds [0.48 milliseconds±6.92 milliseconds/doc]
+    Stats: {total: 11961, forwarded: 11960, doc_len: 29958741 [min=102, max=169220, 2504.91±5348/doc], doc_len_tokens: 6430498 [min=37, max=37099, 643.11±1344/doc], dropped: 1}
+💽 - WRITER: 🐿 Jsonl
+    Runtime: (11.96%) 0 seconds [0.07 milliseconds±0.11 milliseconds/doc]
+    Stats: {cleaned_dataset.jsonl: 11960, total: 11960, doc_len: 29958741 [min=102, max=169220, 2504.91±5348/doc], doc_len_tokens: 6430498 [min=37, max=37099, 643.11±1344/doc]}

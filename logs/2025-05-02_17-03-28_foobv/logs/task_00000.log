@@ -1,0 +1,92 @@
+2025-05-02 17:03:28.769 | INFO     | datatrove.utils.logging:add_task_logger:58 - Launching pipeline for rank=0
+2025-05-02 17:03:28.769 | INFO     | datatrove.utils.logging:log_pipeline:90 - 
+--- 🛠️ PIPELINE 🛠
+📖 - READER: 🐿 Jsonl
+None: None
+🔻 - FILTER: 🌍 Language ID
+🔻 - FILTER: 🥇 Gopher Quality
+💽 - WRITER: 🐿 Jsonl
+2025-05-02 17:03:28.773 | INFO     | datatrove.pipeline.readers.base:read_files_shard:201 - Reading input file cleaned_dataset.jsonl, 1/4
+2025-05-02 17:03:29.396 | ERROR    | datatrove.executor.base:_run_for_rank:108 - numpy.dtype size changed, may indicate binary incompatibility. Expected 96 from C header, got 88 from PyObject
+Traceback (most recent call last):
+
+  File "/home/ubuntu/aloizeaunanogpt/scratchGPT/dataset.py", line 71, in <module>
+    executor.run()
+    │        └ <function LocalPipelineExecutor.run at 0x7c94d91b5b40>
+    └ <datatrove.executor.local.LocalPipelineExecutor object at 0x7c947ba6ff70>
+
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/datatrove/executor/local.py", line 127, in run
+    stats.append(self._launch_run_for_rank(rank, ranks_q))
+    │     │      │    │                    │     └ <AutoProxy[Queue] object, typeid 'Queue' at 0x7c947854bb20>
+    │     │      │    │                    └ 0
+    │     │      │    └ <function LocalPipelineExecutor._launch_run_for_rank at 0x7c94d91b5ab0>
+    │     │      └ <datatrove.executor.local.LocalPipelineExecutor object at 0x7c947ba6ff70>
+    │     └ <method 'append' of 'list' objects>
+    └ []
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/datatrove/executor/local.py", line 76, in _launch_run_for_rank
+    return self._run_for_rank(rank, local_rank)
+           │    │             │     └ 0
+           │    │             └ 0
+           │    └ <function PipelineExecutor._run_for_rank at 0x7c94d91b56c0>
+           └ <datatrove.executor.local.LocalPipelineExecutor object at 0x7c947ba6ff70>
+> File "/home/ubuntu/.local/lib/python3.10/site-packages/datatrove/executor/base.py", line 96, in _run_for_rank
+    deque(pipelined_data, maxlen=0)
+    │     └ <generator object DiskWriter.run at 0x7c94661f30d0>
+    └ <class 'collections.deque'>
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/datatrove/pipeline/writers/disk_base.py", line 178, in run
+    for document in data:
+                    └ <generator object BaseFilter.run at 0x7c94661f3990>
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/datatrove/pipeline/filters/base_filter.py", line 68, in run
+    batch_filter_result = self.filter_batch(batch)
+                          │    │            └ [Document(text="What are the license/legal requirements to write a guidebook about a specific product?\nAs the title says. I'...
+                          │    └ <function BaseFilter.filter_batch at 0x7c94d956b9a0>
+                          └ 🔻 - FILTER: 🥇 Gopher Quality
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/datatrove/pipeline/filters/base_filter.py", line 60, in filter_batch
+    return list(map(self.filter, batch))
+                    │    │       └ [Document(text="What are the license/legal requirements to write a guidebook about a specific product?\nAs the title says. I'...
+                    │    └ <function GopherQualityFilter.filter at 0x7c94d918f910>
+                    └ 🔻 - FILTER: 🥇 Gopher Quality
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/datatrove/pipeline/filters/gopher_quality_filter.py", line 72, in filter
+    words = split_into_words(text, self.language)
+            │                │     │    └ 'eng'
+            │                │     └ 🔻 - FILTER: 🥇 Gopher Quality
+            │                └ "What are the license/legal requirements to write a guidebook about a specific product?\nAs the title says. I'm writing guide...
+            └ <function split_into_words at 0x7c94d918e8c0>
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/datatrove/utils/text.py", line 309, in split_into_words
+    return split_into_parts(text, mode=SPLIT_TEXT_WORDS, language=language)
+           │                │          │                          └ 'eng'
+           │                │          └ 'WORDS'
+           │                └ "What are the license/legal requirements to write a guidebook about a specific product?\nAs the title says. I'm writing guide...
+           └ <functools._lru_cache_wrapper object at 0x7c94d9129a60>
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/datatrove/utils/text.py", line 288, in split_into_parts
+    return tokenizer.word_tokenize(text)
+           │         │             └ "What are the license/legal requirements to write a guidebook about a specific product?\nAs the title says. I'm writing guide...
+           │         └ <function SpaCyTokenizer.word_tokenize at 0x7c9464108820>
+           └ <datatrove.utils.word_tokenizers.SpaCyTokenizer object at 0x7c947ba6e7d0>
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/datatrove/utils/word_tokenizers.py", line 149, in word_tokenize
+    with self.tokenizer.memory_zone():
+         │    └ <property object at 0x7c9464102ca0>
+         └ <datatrove.utils.word_tokenizers.SpaCyTokenizer object at 0x7c947ba6e7d0>
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/datatrove/utils/word_tokenizers.py", line 121, in tokenizer
+    import spacy
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/spacy/__init__.py", line 6, in <module>
+    from .errors import setup_default_warnings
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/spacy/errors.py", line 3, in <module>
+    from .compat import Literal
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/spacy/compat.py", line 4, in <module>
+    from thinc.util import copy_array
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/thinc/__init__.py", line 5, in <module>
+    from .config import registry
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/thinc/config.py", line 5, in <module>
+    from .types import Decorator
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/thinc/types.py", line 27, in <module>
+    from .compat import cupy, has_cupy
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/thinc/compat.py", line 99, in <module>
+    import h5py
+  File "/usr/lib/python3/dist-packages/h5py/__init__.py", line 21, in <module>
+    from . import _debian_h5py_serial as _h5py
+  File "/usr/lib/python3/dist-packages/h5py/_debian_h5py_serial/__init__.py", line 25, in <module>
+    from . import _errors
+  File "h5py/_debian_h5py_serial/_errors.pyx", line 1, in init h5py._debian_h5py_serial._errors
+
+ValueError: numpy.dtype size changed, may indicate binary incompatibility. Expected 96 from C header, got 88 from PyObject
