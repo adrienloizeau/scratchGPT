@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader, Dataset
 from model import Model, CharTokenizer, Block, MultiHeadAttention, FeedForward, Head
 from datasets import load_dataset
 from tqdm import tqdm
-from configs.config import LargeConfig
+from src.config import LargeConfig
 
 # Configuration
 config = LargeConfig()

@@ -3,7 +3,7 @@ from train import CharTokenizer
 from datasets import load_dataset
 import torch
 import torch.nn as nn
-from configs.config import BaseConfig, LargeConfig
+from src.config import BaseConfig, LargeConfig
 
 
 config = LargeConfig()  # or LargeConfig() for larger model

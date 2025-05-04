@@ -5,7 +5,7 @@ import torch.nn.functional as F
 import numpy as np
 from datasets import load_dataset
 from tqdm import tqdm
-from configs.config import BaseConfig, LargeConfig
+from src.config import BaseConfig, LargeConfig
 from model import Model, CharTokenizer, Block, MultiHeadAttention, FeedForward, Head
 import os
 

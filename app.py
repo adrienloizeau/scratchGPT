@@ -1,7 +1,7 @@
 import gradio as gr
 from model import Model, CharTokenizer, Block, MultiHeadAttention, FeedForward, Head
 import torch
-from configs.config import LargeConfig
+from src.config import LargeConfig
 
 # Load the model
 config = LargeConfig()

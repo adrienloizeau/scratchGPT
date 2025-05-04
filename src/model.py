@@ -2,7 +2,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from configs.config import BaseConfig, LargeConfig
+from src.config import BaseConfig, LargeConfig
 
 config = LargeConfig()  # or BaseConfig() for smaller model
 device = config.device
