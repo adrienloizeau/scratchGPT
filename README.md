@@ -7,7 +7,7 @@ ScratchGPT is a project to build a transformer-based language model from scratch
 ## Training Strategies
 
 ### Pretraining
-- **Datasets**: FineWeb and Law Stack Exchange.
+- **Datasets**: FineWeb and small Law Stack Exchange to introduce some instruct.
 - **Pipeline**:
   - **Data Loading**: Extract and prepare raw data.
   - **Tokenization**: Encode sequences with `CharTokenizer`.
@@ -26,6 +26,7 @@ ScratchGPT is a project to build a transformer-based language model from scratch
 ### Filtering done with `datatrove`:
 - **Language**: Keep only English documents using `LanguageFilter`.
 - **Quality**: Remove irrelevant or noisy data (e.g., off-topic Law Stack Exchange discussions).
+- (wip) fast classifier
 
 ---
 
@@ -38,6 +39,6 @@ ScratchGPT is a project to build a transformer-based language model from scratch
 
 ## Future Improvements
 - **Data Filtering**: Use the filtering applied for Fineweb on the datatrove lib.
-- **Dynamic Prompt Optimization (DPO)**: Dynamically optimize prompts and integrate Hugging Face datasets.
+- **Direct Preference Optimization (DPO)**:  align a model without RLHF
 - **Chinchilla Law**: Balance model size and dataset scale for efficiency.
 - **Evaluation**: Add metrics to assess performance.
