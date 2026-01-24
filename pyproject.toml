@@ -1,0 +1,25 @@
+[project]
+name = "scratchgpt"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "datasets>=4.5.0",
+    "datatrove>=0.8.0",
+    "numpy>=2.0.2",
+    "torch>=2.8.0",
+    "tqdm>=4.67.1",
+    "wandb>=0.24.0",
+]
+[project.scripts]
+train = "scratchgpt.training.train:train"
+infer = "scratchgpt.inference.infer:infer"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["scratchgpt*"]
+exclude = ["data*", "wandb*", "artifacts*", "notebooks*", "logs*", "tests*"]

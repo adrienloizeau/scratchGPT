@@ -1,0 +1,34 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug: train",
+      "type": "debugpy",
+      "request": "launch",
+
+      "module": "scratchgpt.training.train",
+
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      }
+    },
+        {
+      "name": "Debug: infer",
+      "type": "debugpy",
+      "request": "launch",
+
+      "module": "scratchgpt.inference.infer",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      }
+    }
+  ]
+}
