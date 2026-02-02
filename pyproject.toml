@@ -7,6 +7,7 @@ requires-python = ">=3.10"
 dependencies = [
     "datasets>=4.5.0",
     "datatrove>=0.8.0",
+    "hydra-core>=1.3.2",
     "numpy>=2.0.2",
     "torch>=2.8.0",
     "tqdm>=4.67.1",
@@ -23,3 +24,6 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 include = ["scratchgpt*"]
 exclude = ["data*", "wandb*", "artifacts*", "notebooks*", "logs*", "tests*"]
+
+[tool.setuptools.package-data]
+scratchgpt = ["configs/hydra/**/*.yaml"]

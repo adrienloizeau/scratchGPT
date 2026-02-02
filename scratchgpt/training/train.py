@@ -1,14 +1,16 @@
-import torch 
+import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import numpy as np
 from datasets import load_dataset
 from tqdm import tqdm
-from scratchgpt.configs.config import BaseConfig, LargeConfig
 from scratchgpt.models.model import Model, CharTokenizer
 import os
 import wandb
+import hydra
+from omegaconf import DictConfig
+CONFIG_PATH = "pkg://scratchgpt.configs.hydra"
 
 @torch.no_grad()
 def estimate_loss(split, m, eval_iters, device='cpu', block_size=128, batch_size=64, data=None):
@@ -33,49 +35,52 @@ def get_batch(block_size=128, batch_size=64, data=None, device='cpu'):
     return x, y
 
 
-def train():
+@hydra.main(version_base=None, config_path=CONFIG_PATH, config_name="config")
+def train(cfg: DictConfig):
 
     # Set the random seed for reproducibility
-    torch.manual_seed(123)
+    torch.manual_seed(cfg.train.seed)
 
-    config = BaseConfig()  # or LargeConfig() for larger model
-    
     # Hyperparameters
-    learning_rate = config.learning_rate
-    block_size = config.block_size  # Maximum context length
-    batch_size = config.batch_size  # Number of independent blocks fed to the model in parallel
-    max_iters = config.max_iters
-    eval_interval = config.eval_interval
-    device = config.device
-    eval_iters = config.eval_iters
-    save_path = config.save_path
-    mode = config.mode
-    n_embd = config.n_embd
-    nb_heads = config.nb_heads
-    nb_layers = config.nb_layers
+    learning_rate = cfg.model.learning_rate
+    block_size = cfg.model.block_size  # Maximum context length
+    batch_size = cfg.model.batch_size  # Number of independent blocks fed to the model in parallel
+    max_iters = cfg.model.max_iters
+    eval_interval = cfg.model.eval_interval
+    device = cfg.model.device
+    if device == "cuda" and not torch.cuda.is_available():
+        print("CUDA not available; falling back to cpu.")
+        device = "cpu"
+    eval_iters = cfg.model.eval_iters
+    save_path = cfg.model.save_path
+    mode = cfg.model.mode
+    n_embd = cfg.model.n_embd
+    nb_heads = cfg.model.nb_heads
+    nb_layers = cfg.model.nb_layers
 
-    wandb.init(
-        project="finetune-instruct",
-        config={
-            "learning_rate": learning_rate,
-            "batch_size": batch_size,
-            "block_size": block_size,
-            "n_embd": n_embd,
-            "nb_heads": nb_heads,
-            "nb_layers": nb_layers,
-        }
-    )
+    if cfg.train.wandb.enabled:
+        wandb.init(
+            project=cfg.train.wandb.project,
+            config={
+                "learning_rate": learning_rate,
+                "batch_size": batch_size,
+                "block_size": block_size,
+                "n_embd": n_embd,
+                "nb_heads": nb_heads,
+                "nb_layers": nb_layers,
+            }
+        )
 
     # Load the dataset, clean and split it
-    dataset_path = "data/processed/cleaned_documents.jsonl"
+    dataset_path = cfg.data.dataset_path
     ds = load_dataset("json", data_files=dataset_path)["train"]["text"]
     ds = ''.join(ds)
-    split_size = int(0.8 * len(ds)) 
+    split_size = int(cfg.data.train_split * len(ds))
     train_data, val_data = ds[:split_size], ds[split_size:]
 
     # Initialize the Tokenizer and DataLoader
     tokenizer = CharTokenizer(ds)
-    tokenizer.save("artifacts/tokenizer/tokenizer_training.txt")
+    tokenizer.save(cfg.data.tokenizer_path)
 
     train_data = tokenizer.encode(train_data)
     val_data = tokenizer.encode(val_data)
@@ -90,7 +95,7 @@ def train():
         m = Model(tokenizer.vocab_size, block_size=block_size, n_embd=n_embd, nb_heads=nb_heads, nb_layers=nb_layers)
         m = torch.load(save_path, map_location=device)
         
-    optimizer = torch.optim.AdamW(m.parameters(), lr=1e-3)
+    optimizer = torch.optim.AdamW(m.parameters(), lr=cfg.train.optimizer.lr)
     best_val = float('inf')
     for iter in tqdm(range(max_iters)):
         if iter % eval_interval == 0 :
@@ -104,7 +109,8 @@ def train():
 
         x, y = get_batch(block_size=block_size, batch_size=batch_size, data=train_data, device=device)
         logits, loss = m(x,y)
-        wandb.log({"train_loss": loss.item(), "iteration": iter, "val_loss": losses['val']})
+        if cfg.train.wandb.enabled:
+            wandb.log({"train_loss": loss.item(), "iteration": iter, "val_loss": losses['val']})
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
         optimizer.step()    
@@ -112,12 +118,13 @@ def train():
     print("Loss: ", loss.item())
 
     print("Training finished, generating text...")
-    custom_text = input("Enter custom text to start generation (leave empty for random): ")
-    if custom_text:
-        context = tokenizer.encode(custom_text).unsqueeze(0).to(device)
-    else:
-        context = torch.zeros((1, 1), dtype=torch.long).to(device)
-    print(tokenizer.decode(m.generate(context, max_new_tokens=500, block_size=block_size)[0]))
+    if cfg.train.prompt_on_finish:
+        custom_text = input("Enter custom text to start generation (leave empty for random): ")
+        if custom_text:
+            context = tokenizer.encode(custom_text).unsqueeze(0).to(device)
+        else:
+            context = torch.zeros((1, 1), dtype=torch.long).to(device)
+        print(tokenizer.decode(m.generate(context, max_new_tokens=cfg.train.max_new_tokens, block_size=block_size)[0]))
 
 if __name__ == "__main__":
     train()

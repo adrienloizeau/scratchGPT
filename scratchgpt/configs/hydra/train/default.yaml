@@ -1,0 +1,8 @@
+seed: 123
+max_new_tokens: 500
+prompt_on_finish: true
+optimizer:
+  lr: 1.0e-3
+wandb:
+  enabled: true
+  project: "finetune-instruct"

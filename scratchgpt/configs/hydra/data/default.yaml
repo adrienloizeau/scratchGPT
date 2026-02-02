@@ -1,0 +1,3 @@
+dataset_path: "data/processed/cleaned_documents.jsonl"
+train_split: 0.8
+tokenizer_path: "artifacts/tokenizer/tokenizer_training.txt"

@@ -1,29 +1,27 @@
-from scratchgpt.training.train import  Model
-from scratchgpt.training.train import CharTokenizer
+from scratchgpt.models.model import Model, CharTokenizer
 from datasets import load_dataset
 import torch
 import torch.nn as nn
-from scratchgpt.configs.config import BaseConfig, LargeConfig
+import hydra
+from omegaconf import DictConfig
+CONFIG_PATH = "pkg://scratchgpt.configs.hydra"
 
-def infer():
+@hydra.main(version_base=None, config_path=CONFIG_PATH, config_name="config")
+def infer(cfg: DictConfig):
 
-    config = BaseConfig()  # or LargeConfig() for larger model
     # Hyperparameters
-    learning_rate = config.learning_rate
-    block_size = config.block_size  # Maximum context length
-    batch_size = config.batch_size  # Number of independent blocks fed to the model in parallel
-    max_iters = config.max_iters
-    eval_interval = config.eval_interval
-    device = config.device
-    eval_iters = config.eval_iters
-    save_path = config.save_path
-    mode = config.mode
-    n_embd = config.n_embd
-    nb_heads = config.nb_heads
-    nb_layers = config.nb_layers
+    block_size = cfg.model.block_size  # Maximum context length
+    device = cfg.model.device
+    if device == "cuda" and not torch.cuda.is_available():
+        print("CUDA not available; falling back to cpu.")
+        device = "cpu"
+    save_path = cfg.model.save_path
+    n_embd = cfg.model.n_embd
+    nb_heads = cfg.model.nb_heads
+    nb_layers = cfg.model.nb_layers
 
     # Load the dataset, clean and split it
-    dataset_path = "data/processed/cleaned_documents.jsonl"
+    dataset_path = cfg.data.dataset_path
     ds = load_dataset("json", data_files=dataset_path)["train"]["text"]
     ds = ''.join(ds)
     # Initialize the Tokenizer and DataLoader
@@ -34,7 +32,7 @@ def infer():
     m = torch.load(save_path, map_location=device, weights_only=False)
     context = torch.zeros((1,1), dtype = torch.long).to(device)
     print("Generated Text:")
-    print(tokenizer.decode(m.generate(context, max_new_tokens = 500, block_size=block_size)[0]))
+    print(tokenizer.decode(m.generate(context, max_new_tokens=cfg.train.max_new_tokens, block_size=block_size)[0]))
 
     # Question Answering
     question = "What is the purpose of this model?"
