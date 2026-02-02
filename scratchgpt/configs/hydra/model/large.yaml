@@ -1,0 +1,12 @@
+learning_rate: 3.0e-4
+block_size: 256
+batch_size: 64
+max_iters: 10000
+eval_interval: 300
+device: cuda
+eval_iters: 200
+n_embd: 384
+nb_heads: 6
+nb_layers: 6
+save_path: "weights/model.pt"
+mode: scratch

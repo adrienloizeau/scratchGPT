@@ -84,17 +84,17 @@ A classifier-based filtering approach is currently work in progress.
 
 ## Configurations
 
-Two primary configurations are provided.
+Hydra configs live in `scratchgpt/configs/hydra`.
 
-**LargeConfig**
-- Designed for A100-class GPUs
-- Larger embedding size and deeper architecture
-- Produces coherent and structured generations
+Available model presets:
+- `model=base` for local experiments
+- `model=large` for larger GPU runs
 
-**SmallConfig**
-- Runs locally
-- Intended for experimentation and debugging
-- Generates simple but meaningful outputs
+Examples:
+```bash
+uv run train model=large
+uv run train model=base train.wandb.enabled=false
+```
 
 ---
 

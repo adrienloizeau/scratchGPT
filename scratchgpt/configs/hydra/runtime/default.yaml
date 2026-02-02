@@ -1,0 +1,8 @@
+# @package hydra
+run:
+  dir: .
+sweep:
+  dir: .
+output_subdir: null
+job:
+  chdir: false

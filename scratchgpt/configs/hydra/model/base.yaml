@@ -1,0 +1,12 @@
+learning_rate: 1.0e-2
+block_size: 8
+batch_size: 16
+max_iters: 5000
+eval_interval: 300
+device: cpu
+eval_iters: 200
+n_embd: 32
+nb_heads: 4
+nb_layers: 4
+save_path: "../trainings_logdir/model.pt"
+mode: scratch
